@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ghép Avatar với Khung</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f0f2f5;
+    }
+    h1 {
+      color: #d7263d;
+    }
+    canvas {
+      margin-top: 20px;
+      max-width: 100%;
+      border: 2px solid #ddd;
+      background: white;
+    }
+    input[type="file"], button {
+      margin: 15px 0;
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background-color: #d7263d;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #a61b2d;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Ghép Avatar Khung 30/4</h1>
+  
+  <input type="file" id="upload" accept="image/*">
+  <br>
+  <canvas id="canvas" width="800" height="800"></canvas>
+  <br>
+  <button id="download" style="display: none;">Tải ảnh về</button>
+
+  <script>
+    const upload = document.getElementById('upload');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const downloadBtn = document.getElementById('download');
+
+    const frame = new Image();
+    frame.src = 'frame.png'; // Khung của bạn đã đặt đúng tên nhé!
+
+    upload.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const userImage = new Image();
+        userImage.onload = function() {
+          // Xóa trắng canvas
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Vẽ ảnh người dùng, căn giữa và co theo canvas
+          ctx.drawImage(userImage, 0, 0, canvas.width, canvas.height);
+
+          // Vẽ đè khung sau khi user ảnh đã load
+          frame.onload = function() {
+            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+          };
+
+          // Nếu frame đã load sẵn từ trước
+          if (frame.complete) {
+            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+          }
+
+          // Hiện nút tải
+          downloadBtn.style.display = 'inline-block';
+        };
+        userImage.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    downloadBtn.addEventListener('click', function() {
+      const link = document.createElement('a');
+      link.download = 'avatar_ghep.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  </script>
+
+</body>
+</html>
